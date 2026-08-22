@@ -113,21 +113,32 @@ export function Hourglass({ size, progress, running, durationMs, glow, rotation 
     return 0.35 * Math.max(0, c) * Math.max(0, c);
   });
 
-  // Static highlight streak along the upper-left of each bulb.
+  // Reflection: a soft lens-shaped band of light hugging the upper bulb's
+  // left curvature — wide in the middle, tapering to points at both ends,
+  // like a window reflected in curved glass.
   const highlightPath = useMemo(() => {
     const p = Skia.Path.Make();
-    const { topHW, botHW, N } = geo;
+    const { topHW, N } = geo;
     const chamberH = yNeckTop - yTopIn;
-    const pts = [0.12, 0.25, 0.4, 0.55];
-    p.moveTo(cx - topHW[Math.round(pts[0] * N)] * 0.72, yTopIn + pts[0] * chamberH);
-    for (let k = 1; k < pts.length; k++) {
-      p.lineTo(cx - topHW[Math.round(pts[k] * N)] * 0.72, yTopIn + pts[k] * chamberH);
+    const s0 = 0.08;
+    const s1 = 0.5;
+    const kOuter = 0.8; // outer edge, as a fraction of the local half-width
+    const kInner = 0.56; // widest point of the band
+    const steps = 16;
+    const outer: [number, number][] = [];
+    const inner: [number, number][] = [];
+    for (let j = 0; j <= steps; j++) {
+      const s = s0 + ((s1 - s0) * j) / steps;
+      const hw = topHW[Math.round(s * N)];
+      const y = yTopIn + s * chamberH;
+      const taper = Math.sin((Math.PI * j) / steps);
+      outer.push([cx - hw * kOuter, y]);
+      inner.push([cx - hw * (kOuter - (kOuter - kInner) * taper), y]);
     }
-    const pts2 = [0.5, 0.65, 0.8];
-    p.moveTo(cx - botHW[Math.round(pts2[0] * N)] * 0.72, yNeckBot + pts2[0] * chamberH);
-    for (let k = 1; k < pts2.length; k++) {
-      p.lineTo(cx - botHW[Math.round(pts2[k] * N)] * 0.72, yNeckBot + pts2[k] * chamberH);
-    }
+    p.moveTo(outer[0][0], outer[0][1]);
+    for (let j = 1; j <= steps; j++) p.lineTo(outer[j][0], outer[j][1]);
+    for (let j = steps; j >= 0; j--) p.lineTo(inner[j][0], inner[j][1]);
+    p.close();
     return p;
   }, [geo]);
 
@@ -220,15 +231,8 @@ export function Hourglass({ size, progress, running, durationMs, glow, rotation 
           strokeWidth={size * 0.009}
           color={theme.glassStroke}
         />
-        <Path
-          path={highlightPath}
-          style="stroke"
-          strokeWidth={size * 0.013}
-          strokeCap="round"
-          strokeJoin="round"
-          color={theme.highlight}
-        >
-          <BlurMask blur={size * 0.008} style="normal" />
+        <Path path={highlightPath} color={theme.highlight}>
+          <BlurMask blur={size * 0.014} style="normal" />
         </Path>
 
         {/* caps — lit from above */}

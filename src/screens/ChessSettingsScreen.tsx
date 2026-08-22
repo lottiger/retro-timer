@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Backdrop } from '../components/Backdrop';
@@ -45,7 +45,7 @@ export function ChessSettingsScreen({ settings, onChange, onBack }: ChessSetting
   const chipStyle = (selected: boolean) => [
     styles.chip,
     {
-      borderColor: selected ? theme.sandDeep : 'transparent',
+      borderColor: selected ? theme.accentDeep : 'transparent',
       backgroundColor: selected ? theme.selectedTint : theme.pressed,
     },
   ];
@@ -74,7 +74,7 @@ export function ChessSettingsScreen({ settings, onChange, onBack }: ChessSetting
             style={[
               styles.card,
               {
-                borderColor: selected ? theme.sandDeep : 'transparent',
+                borderColor: selected ? theme.accentDeep : 'transparent',
                 backgroundColor: selected ? theme.selectedTint : theme.pressed,
               },
             ]}
@@ -83,7 +83,7 @@ export function ChessSettingsScreen({ settings, onChange, onBack }: ChessSetting
             accessibilityState={{ selected }}
             accessibilityLabel={b.title}
           >
-            <Text style={[styles.cardTitle, { color: selected ? theme.sand : theme.text }]}>
+            <Text style={[styles.cardTitle, { color: selected ? theme.accent : theme.text }]}>
               {b.title}
             </Text>
             <Text style={[styles.cardHint, { color: theme.dim }]}>{b.hint}</Text>
@@ -110,10 +110,10 @@ export function ChessSettingsScreen({ settings, onChange, onBack }: ChessSetting
                   accessibilityState={{ selected }}
                   accessibilityLabel={`${tc.label} ${tc.hint}`}
                 >
-                  <Text style={[styles.chipText, { color: selected ? theme.sand : theme.dim }]}>
+                  <Text style={[styles.chipText, { color: selected ? theme.accent : theme.dim }]}>
                     {tc.label}
                   </Text>
-                  <Text style={[styles.chipHint, { color: selected ? theme.sand : theme.faint }]}>
+                  <Text style={[styles.chipHint, { color: selected ? theme.accent : theme.faint }]}>
                     {tc.hint}
                   </Text>
                 </Pressable>
@@ -136,7 +136,7 @@ export function ChessSettingsScreen({ settings, onChange, onBack }: ChessSetting
                   accessibilityState={{ selected }}
                   accessibilityLabel={`${t.label} per turn`}
                 >
-                  <Text style={[styles.chipText, { color: selected ? theme.sand : theme.dim }]}>
+                  <Text style={[styles.chipText, { color: selected ? theme.accent : theme.dim }]}>
                     {t.label}
                   </Text>
                 </Pressable>
@@ -169,14 +169,17 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   cardTitle: {
-    fontSize: 17,
+    fontSize: 15,
     fontWeight: '300',
-    letterSpacing: 0.5,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
   },
   cardHint: {
-    fontSize: 13,
-    marginTop: 4,
-    lineHeight: 18,
+    fontSize: 11,
+    letterSpacing: 1,
+    marginTop: 5,
+    lineHeight: 16,
+    textTransform: 'uppercase',
   },
   chips: {
     flexDirection: 'row',
@@ -192,7 +195,9 @@ const styles = StyleSheet.create({
     minWidth: 88,
   },
   chipText: {
-    fontSize: 17,
+    fontSize: 15,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
   },
   chipHint: {
     fontSize: 11,

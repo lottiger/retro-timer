@@ -253,7 +253,7 @@ export function ChessScreen({ settings, onBack, onOpenSettings }: ChessScreenPro
           <Text
             style={[
               styles.time,
-              { color: flagged.L ? theme.sand : theme.dim, marginTop: -size * 0.08 },
+              { color: flagged.L ? theme.accent : theme.dim, marginTop: -size * 0.08 },
             ]}
           >
             {times.L}
@@ -264,7 +264,7 @@ export function ChessScreen({ settings, onBack, onOpenSettings }: ChessScreenPro
           <Text
             style={[
               styles.time,
-              { color: flagged.R ? theme.sand : theme.dim, marginTop: -size * 0.08 },
+              { color: flagged.R ? theme.accent : theme.dim, marginTop: -size * 0.08 },
             ]}
           >
             {times.R}

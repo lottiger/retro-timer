@@ -142,7 +142,7 @@ export function CustomTimeScreen({ settings, onStart, onBack }: CustomTimeScreen
         accessibilityLabel="Start hourglass"
         accessibilityState={{ disabled: total === 0 }}
       >
-        <Text style={[styles.startText, { color: theme.sand }]}>Start</Text>
+        <Text style={[styles.startText, { color: theme.accent }]}>Start</Text>
       </Pressable>
     </View>
   );
