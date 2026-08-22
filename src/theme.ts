@@ -14,9 +14,9 @@ export const darkTheme = {
 	dim: 'rgba(232, 234, 240, 0.8)',
 	faint: 'rgba(232, 234, 240, 0.65)',
 	hairline: 'rgba(232,234,240,0.08)',
-	sand: '#E9ECF2',
-	sandDeep: '#C3C9D4',
-	sandBright: '#FFFFFF',
+	sand: '#AEB9CB',
+	sandDeep: '#8793A7',
+	sandBright: '#D8E0EE',
 	/** Warm accent for UI emphasis — kept separate from the sand material. */
 	accent: '#E2B26A',
 	accentDeep: '#C98F45',
