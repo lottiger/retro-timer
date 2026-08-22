@@ -14,8 +14,6 @@ export interface Settings {
   turnSeconds: number;
   /** Last duration chosen on the Custom screen, seconds. */
   customSeconds: number;
-  /** Rotate each chess player's half toward them (phone lying between players). */
-  chessFacePlayers: boolean;
   sound: boolean;
   haptics: boolean;
   /** Appearance: follow the system, or force dark/light. */
@@ -28,7 +26,6 @@ export const DEFAULT_SETTINGS: Settings = {
   chessIncrementSeconds: 0,
   turnSeconds: 60,
   customSeconds: 300,
-  chessFacePlayers: false,
   sound: true,
   haptics: true,
   themeMode: 'system',

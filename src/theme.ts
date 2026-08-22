@@ -8,6 +8,8 @@ export const ThemeModeContext = createContext<ThemeMode>('system');
 
 export const darkTheme = {
   bg: '#0B0E13',
+  /** Soft center glow for the backdrop vignette. */
+  bgGlow: '#141926',
   text: '#E8EAF0',
   dim: 'rgba(232, 234, 240, 0.8)',
   faint: 'rgba(232, 234, 240, 0.65)',
@@ -29,6 +31,7 @@ export type Theme = typeof darkTheme;
 
 export const lightTheme: Theme = {
   bg: '#F5F2EB',
+  bgGlow: '#FCFAF5',
   text: '#23262C',
   dim: 'rgba(35, 38, 44, 0.8)',
   faint: 'rgba(35, 38, 44, 0.6)',

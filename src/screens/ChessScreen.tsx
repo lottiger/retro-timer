@@ -12,6 +12,7 @@ import {
   withTiming,
 } from 'react-native-reanimated';
 import { Hourglass } from '../hourglass/Hourglass';
+import { Backdrop } from '../components/Backdrop';
 import { CornerButton } from '../components/CornerButton';
 import { useChime } from '../useChime';
 import { finishHaptic, tapHaptic } from '../haptics';
@@ -227,7 +228,6 @@ export function ChessScreen({ settings, onBack, onOpenSettings }: ChessScreenPro
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [totalMs]);
 
-  const face = settings.chessFacePlayers;
   const hint =
     phase === 'idle'
       ? 'tap to start'
@@ -246,8 +246,9 @@ export function ChessScreen({ settings, onBack, onOpenSettings }: ChessScreenPro
         phase === 'running' ? 'Switch player. Long press to pause.' : 'Start. Long press to reset.'
       }
     >
+      <Backdrop />
       <View style={styles.row} pointerEvents="none">
-        <View style={[styles.player, face && { transform: [{ rotate: '-90deg' }] }]}>
+        <View style={styles.player}>
           <Hourglass size={size} progress={pL} running={runL} durationMs={totalMs} glow={glowL} />
           <Text
             style={[
@@ -258,7 +259,7 @@ export function ChessScreen({ settings, onBack, onOpenSettings }: ChessScreenPro
             {times.L}
           </Text>
         </View>
-        <View style={[styles.player, face && { transform: [{ rotate: '90deg' }] }]}>
+        <View style={styles.player}>
           <Hourglass size={size} progress={pR} running={runR} durationMs={totalMs} glow={glowR} />
           <Text
             style={[
@@ -313,16 +314,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   time: {
-    fontSize: 28,
-    fontWeight: '300',
+    fontSize: 26,
+    fontWeight: '200',
     fontVariant: ['tabular-nums'],
-    letterSpacing: 1,
+    letterSpacing: 2,
   },
   hint: {
     position: 'absolute',
     alignSelf: 'center',
-    fontSize: 13,
-    letterSpacing: 2,
+    fontSize: 11,
+    letterSpacing: 3,
     textTransform: 'uppercase',
   },
 });

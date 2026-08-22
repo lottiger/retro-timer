@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
+import { Backdrop } from '../components/Backdrop';
 import { CornerButton } from '../components/CornerButton';
 import { useTheme, type Theme } from '../theme';
 import type { Settings } from '../settings';
@@ -99,6 +100,7 @@ export function CustomTimeScreen({ settings, onStart, onBack }: CustomTimeScreen
         { backgroundColor: theme.bg, paddingTop: insets.top, paddingBottom: insets.bottom + 24 },
       ]}
     >
+      <Backdrop />
       <CornerButton
         glyph="‹"
         onPress={onBack}
@@ -163,10 +165,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   unit: {
-    fontSize: 13,
-    letterSpacing: 3,
+    fontSize: 11,
+    letterSpacing: 4,
     textTransform: 'uppercase',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   colon: {
     fontSize: 44,
@@ -203,8 +205,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 48,
   },
   startText: {
-    fontSize: 32,
-    fontWeight: '200',
-    letterSpacing: 4,
+    fontSize: 22,
+    fontWeight: '300',
+    letterSpacing: 8,
+    textTransform: 'uppercase',
   },
 });

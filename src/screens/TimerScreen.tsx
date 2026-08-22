@@ -17,6 +17,7 @@ import {
   withTiming,
 } from 'react-native-reanimated';
 import { Hourglass } from '../hourglass/Hourglass';
+import { Backdrop } from '../components/Backdrop';
 import { CornerButton } from '../components/CornerButton';
 import { useChime } from '../useChime';
 import { finishHaptic, tapHaptic } from '../haptics';
@@ -156,6 +157,7 @@ export function TimerScreen({ seconds, settings, onBack }: TimerScreenProps) {
       accessibilityLabel="Restart hourglass"
       accessibilityValue={a11yTime ? { text: a11yTime } : undefined}
     >
+      <Backdrop />
       <View style={styles.center} pointerEvents="none">
         <Hourglass
           size={size}

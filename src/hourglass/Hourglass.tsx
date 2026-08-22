@@ -143,31 +143,31 @@ export function Hourglass({ size, progress, running, durationMs, glow, rotation 
       pointerEvents="none"
     >
       <Canvas style={{ width: geo.canvasW, height: geo.canvasH }}>
-        {/* ground shadow */}
+        {/* ground shadow — wide, soft and quiet */}
         <Oval
-          x={cx - R * 0.7}
+          x={cx - R * 0.8}
           y={yBotIn + capH + size * 0.03}
-          width={R * 1.4}
-          height={size * 0.05}
+          width={R * 1.6}
+          height={size * 0.042}
           color="black"
           opacity={shadowOpacity}
         >
-          <BlurMask blur={size * 0.045} style="normal" />
+          <BlurMask blur={size * 0.055} style="normal" />
         </Oval>
 
         {/* active glow behind the glass */}
         <Path
           path={geo.glassPath}
           style="stroke"
-          strokeWidth={size * 0.07}
+          strokeWidth={size * 0.06}
           color={theme.sand}
           opacity={glowOpacity}
         >
-          <BlurMask blur={size * 0.1} style="normal" />
+          <BlurMask blur={size * 0.12} style="normal" />
         </Path>
         <Path path={geo.glassPath} color={theme.sand} opacity={glowFillOpacity} />
 
-        {/* glass body */}
+        {/* glass body — vertical tint + edge sheen for wall thickness */}
         <Path path={geo.glassPath}>
           <LinearGradient
             start={vec(cx, yTopIn)}
@@ -175,14 +175,23 @@ export function Hourglass({ size, progress, running, durationMs, glow, rotation 
             colors={[theme.glassFillTop, theme.glassFillBottom]}
           />
         </Path>
+        <Path path={geo.glassPath}>
+          <LinearGradient
+            start={vec(cx - R, 0)}
+            end={vec(cx + R, 0)}
+            colors={[theme.glassFillTop, 'rgba(255,255,255,0)', theme.glassFillTop]}
+            positions={[0, 0.5, 1]}
+          />
+        </Path>
 
-        {/* sand — upper chamber */}
+        {/* sand — upper chamber, shaded across for a rounded volume */}
         <Group clip={geo.topClip}>
           <Path path={topSandPath}>
             <LinearGradient
-              start={vec(cx, yTopIn)}
-              end={vec(cx, yNeckTop)}
-              colors={[theme.sand, theme.sandDeep]}
+              start={vec(cx - R, 0)}
+              end={vec(cx + R, 0)}
+              colors={[theme.sandDeep, theme.sand, theme.sandDeep]}
+              positions={[0, 0.45, 1]}
             />
           </Path>
         </Group>
@@ -196,9 +205,10 @@ export function Hourglass({ size, progress, running, durationMs, glow, rotation 
         <Group clip={geo.botClip}>
           <Path path={botSandPath}>
             <LinearGradient
-              start={vec(cx, yNeckBot)}
-              end={vec(cx, yBotIn)}
-              colors={[theme.sand, theme.sandDeep]}
+              start={vec(cx - R, 0)}
+              end={vec(cx + R, 0)}
+              colors={[theme.sandDeep, theme.sand, theme.sandDeep]}
+              positions={[0, 0.45, 1]}
             />
           </Path>
         </Group>
@@ -207,13 +217,13 @@ export function Hourglass({ size, progress, running, durationMs, glow, rotation 
         <Path
           path={geo.glassPath}
           style="stroke"
-          strokeWidth={size * 0.011}
+          strokeWidth={size * 0.009}
           color={theme.glassStroke}
         />
         <Path
           path={highlightPath}
           style="stroke"
-          strokeWidth={size * 0.016}
+          strokeWidth={size * 0.013}
           strokeCap="round"
           strokeJoin="round"
           color={theme.highlight}
@@ -221,39 +231,33 @@ export function Hourglass({ size, progress, running, durationMs, glow, rotation 
           <BlurMask blur={size * 0.008} style="normal" />
         </Path>
 
-        {/* wooden caps */}
+        {/* caps — lit from above */}
         <RoundedRect
           x={cx - capW / 2}
           y={yTopIn - capH + 2}
           width={capW}
           height={capH}
           r={size * 0.02}
-          color={theme.cap}
-        />
-        <RoundedRect
-          x={cx - capW / 2}
-          y={yTopIn - capH + 2}
-          width={capW}
-          height={capH * 0.45}
-          r={size * 0.02}
-          color={theme.capEdge}
-        />
+        >
+          <LinearGradient
+            start={vec(0, yTopIn - capH + 2)}
+            end={vec(0, yTopIn + 2)}
+            colors={[theme.capEdge, theme.cap]}
+          />
+        </RoundedRect>
         <RoundedRect
           x={cx - capW / 2}
           y={yBotIn - 2}
           width={capW}
           height={capH}
           r={size * 0.02}
-          color={theme.cap}
-        />
-        <RoundedRect
-          x={cx - capW / 2}
-          y={yBotIn - 2}
-          width={capW}
-          height={capH * 0.45}
-          r={size * 0.02}
-          color={theme.capEdge}
-        />
+        >
+          <LinearGradient
+            start={vec(0, yBotIn - 2)}
+            end={vec(0, yBotIn - 2 + capH)}
+            colors={[theme.capEdge, theme.cap]}
+          />
+        </RoundedRect>
       </Canvas>
     </Animated.View>
   );

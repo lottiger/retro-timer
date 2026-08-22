@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Backdrop } from '../components/Backdrop';
 import { CornerButton } from '../components/CornerButton';
 import { useTheme } from '../theme';
 import type { ChessBehavior, Settings } from '../settings';
@@ -37,19 +38,16 @@ const TURN_LENGTHS = [
   { label: '3 min', seconds: 180 },
 ];
 
-const LAYOUTS: { value: boolean; label: string }[] = [
-  { value: false, label: 'Upright' },
-  { value: true, label: 'Face players' },
-];
-
 export function ChessSettingsScreen({ settings, onChange, onBack }: ChessSettingsScreenProps) {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
 
   const chipStyle = (selected: boolean) => [
     styles.chip,
-    { borderColor: selected ? theme.sandDeep : theme.hairline },
-    selected && { backgroundColor: theme.selectedTint },
+    {
+      borderColor: selected ? theme.sandDeep : 'transparent',
+      backgroundColor: selected ? theme.selectedTint : theme.pressed,
+    },
   ];
 
   return (
@@ -59,6 +57,7 @@ export function ChessSettingsScreen({ settings, onChange, onBack }: ChessSetting
         { backgroundColor: theme.bg, paddingTop: insets.top + 56, paddingBottom: insets.bottom },
       ]}
     >
+      <Backdrop />
       <CornerButton
         glyph="‹"
         onPress={onBack}
@@ -74,8 +73,10 @@ export function ChessSettingsScreen({ settings, onChange, onBack }: ChessSetting
             key={b.value}
             style={[
               styles.card,
-              { borderColor: selected ? theme.sandDeep : theme.hairline },
-              selected && { backgroundColor: theme.selectedTint },
+              {
+                borderColor: selected ? theme.sandDeep : 'transparent',
+                backgroundColor: selected ? theme.selectedTint : theme.pressed,
+              },
             ]}
             onPress={() => onChange({ behavior: b.value })}
             accessibilityRole="radio"
@@ -145,29 +146,6 @@ export function ChessSettingsScreen({ settings, onChange, onBack }: ChessSetting
         </>
       )}
 
-      <Text style={[styles.section, { color: theme.faint }]}>Layout</Text>
-      <View style={styles.chips}>
-        {LAYOUTS.map((l) => {
-          const selected = settings.chessFacePlayers === l.value;
-          return (
-            <Pressable
-              key={l.label}
-              style={chipStyle(selected)}
-              onPress={() => onChange({ chessFacePlayers: l.value })}
-              accessibilityRole="radio"
-              accessibilityState={{ selected }}
-              accessibilityLabel={l.label}
-            >
-              <Text style={[styles.chipText, { color: selected ? theme.sand : theme.dim }]}>
-                {l.label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
-      <Text style={[styles.footnote, { color: theme.faint }]}>
-        Face players rotates each hourglass toward its player when the phone lies between them.
-      </Text>
     </View>
   );
 }
@@ -178,21 +156,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   section: {
-    fontSize: 13,
-    letterSpacing: 3,
+    fontSize: 11,
+    letterSpacing: 4,
     textTransform: 'uppercase',
-    marginTop: 28,
+    marginTop: 30,
     marginBottom: 12,
   },
   card: {
     borderWidth: 1,
-    borderRadius: 14,
-    padding: 16,
+    borderRadius: 16,
+    padding: 18,
     marginBottom: 10,
   },
   cardTitle: {
-    fontSize: 18,
-    fontWeight: '400',
+    fontSize: 17,
+    fontWeight: '300',
+    letterSpacing: 0.5,
   },
   cardHint: {
     fontSize: 13,
@@ -220,10 +199,5 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
     textTransform: 'uppercase',
     marginTop: 2,
-  },
-  footnote: {
-    fontSize: 12,
-    lineHeight: 17,
-    marginTop: 12,
   },
 });

@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
+import { Backdrop } from '../components/Backdrop';
 import { useTheme } from '../theme';
 import type { Settings } from '../settings';
 
@@ -53,14 +54,12 @@ export function HomeScreen({
         { backgroundColor: theme.bg, paddingTop: insets.top, paddingBottom: insets.bottom },
       ]}
     >
+      <Backdrop />
+      <Text style={[styles.wordmark, { color: theme.faint }]}>Hourglass</Text>
       {OPTIONS.map((o) => (
         <Pressable
           key={o.seconds}
-          style={({ pressed }) => [
-            styles.option,
-            { borderBottomColor: theme.hairline },
-            pressed && { backgroundColor: theme.pressed },
-          ]}
+          style={({ pressed }) => [styles.option, pressed && styles.optionPressed]}
           onPress={() => onPickDuration(o.seconds)}
           accessibilityRole="button"
           accessibilityLabel={`Start ${o.label} hourglass`}
@@ -69,11 +68,7 @@ export function HomeScreen({
         </Pressable>
       ))}
       <Pressable
-        style={({ pressed }) => [
-          styles.option,
-          { borderBottomColor: theme.hairline },
-          pressed && { backgroundColor: theme.pressed },
-        ]}
+        style={({ pressed }) => [styles.option, pressed && styles.optionPressed]}
         onPress={onPickCustom}
         accessibilityRole="button"
         accessibilityLabel="Choose a custom duration"
@@ -81,7 +76,7 @@ export function HomeScreen({
         <Text style={[styles.label, { color: theme.text }]}>Custom</Text>
       </Pressable>
       <Pressable
-        style={({ pressed }) => [styles.option, styles.last, pressed && { backgroundColor: theme.pressed }]}
+        style={({ pressed }) => [styles.option, pressed && styles.optionPressed]}
         onPress={onPickChess}
         accessibilityRole="button"
         accessibilityLabel="Start chess clock"
@@ -142,28 +137,37 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
   },
+  wordmark: {
+    textAlign: 'center',
+    fontSize: 11,
+    fontWeight: '300',
+    letterSpacing: 8,
+    textTransform: 'uppercase',
+    paddingTop: 20,
+  },
   option: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    borderBottomWidth: StyleSheet.hairlineWidth,
   },
-  last: {
-    borderBottomWidth: 0,
+  optionPressed: {
+    opacity: 0.55,
+    transform: [{ scale: 0.97 }],
   },
   label: {
-    fontSize: 42,
+    fontSize: 38,
     fontWeight: '200',
-    letterSpacing: 2,
+    letterSpacing: 4,
   },
   feedbackRow: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'center',
-    gap: 36,
-    paddingVertical: 16,
+    gap: 32,
+    paddingVertical: 18,
   },
   feedback: {
-    fontSize: 13,
+    fontSize: 11,
     letterSpacing: 3,
     textTransform: 'uppercase',
   },
