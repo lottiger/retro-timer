@@ -106,7 +106,7 @@ function mix(a, b, t) {
 }
 
 const BG = [11, 14, 19, 255];
-const SAND = [226, 178, 106, 255];
+const SAND = [174, 185, 203, 255]; // cool steel — matches the dark theme's sand
 const CAP = [46, 53, 66, 255];
 const OUTLINE = [235, 240, 250, 255];
 const CLEAR = [0, 0, 0, 0];

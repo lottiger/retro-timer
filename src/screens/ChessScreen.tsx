@@ -2,10 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useKeepAwake } from 'expo-keep-awake';
-import {
+import Animated, {
   cancelAnimation,
   Easing,
   runOnJS,
+  useAnimatedStyle,
   useSharedValue,
   withDelay,
   withSequence,
@@ -69,6 +70,16 @@ export function ChessScreen({ settings, onBack, onOpenSettings }: ChessScreenPro
 
   const settingsRef = useRef(settings);
   settingsRef.current = settings;
+
+  // Fleeting gesture hint shown when the game starts, then fades away.
+  const hintOpacity = useSharedValue(0);
+  const hintStyle = useAnimatedStyle(() => ({ opacity: hintOpacity.value }));
+  const whisperHint = () => {
+    hintOpacity.value = withSequence(
+      withTiming(1, { duration: 500 }),
+      withDelay(2400, withTiming(0, { duration: 900 }))
+    );
+  };
 
   const sv = (side: Side) =>
     side === 'L'
@@ -159,6 +170,7 @@ export function ChessScreen({ settings, onBack, onOpenSettings }: ChessScreenPro
 
   const tap = () => {
     if (phaseRef.current === 'idle' || phaseRef.current === 'paused') {
+      if (phaseRef.current === 'idle') whisperHint();
       setPhaseBoth('running');
       startActive();
       if (settingsRef.current.haptics) tapHaptic();
@@ -271,13 +283,20 @@ export function ChessScreen({ settings, onBack, onOpenSettings }: ChessScreenPro
           </Text>
         </View>
       </View>
-      {hint && (
+      {hint ? (
         <Text
           style={[styles.hint, { color: theme.faint, bottom: insets.bottom + 28 }]}
           pointerEvents="none"
         >
           {hint}
         </Text>
+      ) : (
+        <Animated.Text
+          style={[styles.hint, { color: theme.faint, bottom: insets.bottom + 28 }, hintStyle]}
+          pointerEvents="none"
+        >
+          tap to switch — hold to pause
+        </Animated.Text>
       )}
       <CornerButton
         glyph="‹"

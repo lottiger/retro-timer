@@ -3,16 +3,19 @@ import {
   AccessibilityInfo,
   Pressable,
   StyleSheet,
+  Text,
   useWindowDimensions,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useKeepAwake } from 'expo-keep-awake';
-import {
+import Animated, {
   cancelAnimation,
   Easing,
   runOnJS,
+  useAnimatedStyle,
   useSharedValue,
+  withDelay,
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
@@ -49,7 +52,20 @@ export function TimerScreen({ seconds, settings, onBack }: TimerScreenProps) {
   const flip = useSharedValue(0);
   const flipping = useRef(false);
   const notifId = useRef<string | null>(null);
+  const pausedRef = useRef(false);
+  const [paused, setPaused] = useState(false);
   const [a11yTime, setA11yTime] = useState('');
+
+  // A fleeting whisper shown when the glass starts: fades in, lingers a
+  // moment, fades away — enough to teach the gesture without cluttering.
+  const hintOpacity = useSharedValue(0);
+  const hintStyle = useAnimatedStyle(() => ({ opacity: hintOpacity.value }));
+  const whisperHint = () => {
+    hintOpacity.value = withSequence(
+      withTiming(1, { duration: 500 }),
+      withDelay(2400, withTiming(0, { duration: 900 }))
+    );
+  };
 
   const settingsRef = useRef(settings);
   settingsRef.current = settings;
@@ -68,6 +84,8 @@ export function TimerScreen({ seconds, settings, onBack }: TimerScreenProps) {
     glow.value = withTiming(0, { duration: 200 });
     progress.value = 0;
     running.value = 1;
+    pausedRef.current = false;
+    setPaused(false);
     cancelNotification(notifId.current);
     notifId.current = null;
     scheduleExpiryNotification(
@@ -87,8 +105,45 @@ export function TimerScreen({ seconds, settings, onBack }: TimerScreenProps) {
     );
   };
 
+  // Long press freezes the sand mid-flow; the next tap lets it run again.
+  const pause = () => {
+    if (flipping.current || pausedRef.current) return;
+    if (progress.value >= 0.999) return; // already finished — nothing to pause
+    pausedRef.current = true;
+    setPaused(true);
+    cancelAnimation(progress);
+    running.value = 0;
+    cancelNotification(notifId.current);
+    notifId.current = null;
+    if (settingsRef.current.haptics) tapHaptic();
+  };
+
+  const resume = () => {
+    pausedRef.current = false;
+    setPaused(false);
+    const remainingMs = durationMs * (1 - progress.value);
+    running.value = 1;
+    scheduleExpiryNotification(
+      remainingMs,
+      'The hourglass has finished.',
+      settingsRef.current.sound
+    ).then((id) => {
+      notifId.current = id;
+    });
+    progress.value = withTiming(
+      1,
+      { duration: remainingMs, easing: Easing.linear },
+      (finished) => {
+        'worklet';
+        if (finished) runOnJS(onFinished)();
+      }
+    );
+    if (settingsRef.current.haptics) tapHaptic();
+  };
+
   useEffect(() => {
     start();
+    whisperHint();
     return () => {
       cancelAnimation(progress);
       cancelNotification(notifId.current);
@@ -122,6 +177,10 @@ export function TimerScreen({ seconds, settings, onBack }: TimerScreenProps) {
   // flip=0/progress=0, so we snap both and restart without any visible jump.
   const restart = () => {
     if (flipping.current) return;
+    if (pausedRef.current) {
+      resume();
+      return;
+    }
     flipping.current = true;
     cancelAnimation(progress);
     cancelNotification(notifId.current);
@@ -153,8 +212,12 @@ export function TimerScreen({ seconds, settings, onBack }: TimerScreenProps) {
     <Pressable
       style={[styles.root, { backgroundColor: theme.bg }]}
       onPress={restart}
+      onLongPress={pause}
+      delayLongPress={450}
       accessibilityRole="button"
-      accessibilityLabel="Restart hourglass"
+      accessibilityLabel={
+        paused ? 'Resume hourglass' : 'Restart hourglass. Long press to pause.'
+      }
       accessibilityValue={a11yTime ? { text: a11yTime } : undefined}
     >
       <Backdrop />
@@ -168,6 +231,21 @@ export function TimerScreen({ seconds, settings, onBack }: TimerScreenProps) {
           rotation={flip}
         />
       </View>
+      {paused ? (
+        <Text
+          style={[styles.hint, { color: theme.faint, bottom: insets.bottom + 28 }]}
+          pointerEvents="none"
+        >
+          paused — tap to resume
+        </Text>
+      ) : (
+        <Animated.Text
+          style={[styles.hint, { color: theme.faint, bottom: insets.bottom + 28 }, hintStyle]}
+          pointerEvents="none"
+        >
+          tap to restart — hold to pause
+        </Animated.Text>
+      )}
       <CornerButton
         glyph="‹"
         onPress={onBack}
@@ -190,5 +268,12 @@ const styles = StyleSheet.create({
     bottom: 0,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  hint: {
+    position: 'absolute',
+    alignSelf: 'center',
+    fontSize: 11,
+    letterSpacing: 3,
+    textTransform: 'uppercase',
   },
 });
