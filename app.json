@@ -41,7 +41,8 @@
     },
     "plugins": [
       "expo-audio",
-      "expo-notifications"
+      "expo-notifications",
+      "expo-asset"
     ],
     "extra": {
       "eas": {
