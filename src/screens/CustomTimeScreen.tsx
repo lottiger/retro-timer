@@ -26,16 +26,20 @@ const VISIBLE = 5; // odd number of rows in the wheel window
 
 interface WheelProps {
   count: number;
-  initial: number;
+  value: number;
   onChange: (value: number) => void;
   haptics: boolean;
   theme: Theme;
   accessibilityLabel: string;
+  /** Spoken after the value, e.g. "minutes" → "5 minutes". */
+  unit: string;
 }
 
 /** A vertical snap wheel in the style of the native iOS timer picker. */
-function Wheel({ count, initial, onChange, haptics, theme, accessibilityLabel }: WheelProps) {
-  const lastIdx = useRef(initial);
+function Wheel({ count, value, onChange, haptics, theme, accessibilityLabel, unit }: WheelProps) {
+  const scrollRef = useRef<ScrollView>(null);
+  const lastIdx = useRef(value);
+  const initialIdx = useRef(value);
 
   const idxFromOffset = (y: number) =>
     Math.min(count - 1, Math.max(0, Math.round(y / ITEM_H)));
@@ -55,15 +59,36 @@ function Wheel({ count, initial, onChange, haptics, theme, accessibilityLabel }:
     onChange(idx);
   };
 
+  // VoiceOver "adjustable": swipe up/down steps the value one notch.
+  const step = (delta: number) => {
+    const idx = Math.min(count - 1, Math.max(0, lastIdx.current + delta));
+    lastIdx.current = idx;
+    onChange(idx);
+    scrollRef.current?.scrollTo({ y: idx * ITEM_H, animated: false });
+    if (haptics) Haptics.selectionAsync().catch(() => {});
+  };
+
   const pad = (ITEM_H * (VISIBLE - 1)) / 2;
 
   return (
-    <View style={styles.wheel} accessibilityLabel={accessibilityLabel}>
+    <View
+      style={styles.wheel}
+      accessible
+      accessibilityRole="adjustable"
+      accessibilityLabel={accessibilityLabel}
+      accessibilityValue={{ text: `${value} ${unit}` }}
+      accessibilityActions={[{ name: 'increment' }, { name: 'decrement' }]}
+      onAccessibilityAction={(e) => {
+        if (e.nativeEvent.actionName === 'increment') step(1);
+        else if (e.nativeEvent.actionName === 'decrement') step(-1);
+      }}
+    >
       <ScrollView
+        ref={scrollRef}
         snapToInterval={ITEM_H}
         decelerationRate="fast"
         showsVerticalScrollIndicator={false}
-        contentOffset={{ x: 0, y: initial * ITEM_H }}
+        contentOffset={{ x: 0, y: initialIdx.current * ITEM_H }}
         contentContainerStyle={{ paddingVertical: pad }}
         onScroll={onScroll}
         scrollEventThrottle={16}
@@ -113,11 +138,12 @@ export function CustomTimeScreen({ settings, onStart, onBack }: CustomTimeScreen
             <Text style={[styles.unit, { color: theme.faint }]}>min</Text>
             <Wheel
               count={61}
-              initial={Math.min(60, Math.floor(settings.customSeconds / 60))}
+              value={minutes}
               onChange={setMinutes}
               haptics={settings.haptics}
               theme={theme}
               accessibilityLabel="Minutes"
+              unit="minutes"
             />
           </View>
           <Text style={[styles.colon, { color: theme.dim }]}>:</Text>
@@ -125,11 +151,12 @@ export function CustomTimeScreen({ settings, onStart, onBack }: CustomTimeScreen
             <Text style={[styles.unit, { color: theme.faint }]}>sec</Text>
             <Wheel
               count={60}
-              initial={settings.customSeconds % 60}
+              value={seconds}
               onChange={setSeconds}
               haptics={settings.haptics}
               theme={theme}
               accessibilityLabel="Seconds"
+              unit="seconds"
             />
           </View>
         </View>

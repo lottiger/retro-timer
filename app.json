@@ -13,10 +13,12 @@
       "backgroundColor": "#F5F2EB"
     },
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "se.lilodev.hourglass",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "CFBundleDevelopmentRegion": "en",
+        "CFBundleLocalizations": ["en"]
       }
     },
     "android": {
