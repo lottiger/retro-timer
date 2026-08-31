@@ -105,14 +105,20 @@ function mix(a, b, t) {
   ];
 }
 
-const BG = [11, 14, 19, 255];
-const SAND = [174, 185, 203, 255]; // cool steel — matches the dark theme's sand
-const CAP = [46, 53, 66, 255];
-const OUTLINE = [235, 240, 250, 255];
 const CLEAR = [0, 0, 0, 0];
 const WHITE = [255, 255, 255, 255];
 
+// Light-theme palette — warm paper ground, dark grey sand.
+const PALETTE = {
+  bg: [245, 242, 235, 255],
+  sand: [58, 62, 70, 255],
+  cap: [74, 68, 56, 255],
+  outline: [40, 45, 55, 255],
+  tint: [30, 35, 45, 255], // glass interior wash
+};
+
 function render(S, { scale, background, mono }) {
+  const { bg: BG, sand: SAND, cap: CAP, outline: OUTLINE, tint: TINT } = PALETTE;
   const g = makeGeometry(S, scale);
   const stroke = Math.max(1.5, g.glassW * 0.012);
   const surfTopY = g.yTop + g.chamberH * 0.42;
@@ -146,7 +152,7 @@ function render(S, { scale, background, mono }) {
       if (ady <= streamW && y > g.yNeckTop) return SAND;
       // glass interior tint
       const under = background ? BG : CLEAR;
-      return mix(under, [255, 255, 255, 255], 0.06);
+      return mix(under, TINT, 0.05);
     }
     // outline just outside the silhouette
     if (inGlass(dx, y, stroke, g)) {
@@ -203,6 +209,6 @@ const out = (name, buf) => {
 out('icon.png', render(1024, { scale: 0.55, background: true, mono: false }));
 out('splash-icon.png', render(1024, { scale: 0.45, background: false, mono: false }));
 out('android-icon-foreground.png', render(1024, { scale: 0.38, background: false, mono: false }));
-out('android-icon-background.png', solid(1024, BG));
+out('android-icon-background.png', solid(1024, PALETTE.bg));
 out('android-icon-monochrome.png', render(1024, { scale: 0.38, background: false, mono: true }));
 out('favicon.png', render(64, { scale: 0.7, background: true, mono: false }));
